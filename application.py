@@ -14,9 +14,9 @@ def home():
 
 @app.route('/generate', methods=['POST'])
 def generate():
+	NUM_MAPS_TO_GENERATE = 6  # Change this
 	# receive post
 	graph_str = request.data.decode('utf-8')
 	graph_data = json.loads(graph_str)
-	return Response(run_model(graph_data), mimetype='text/plain')
-# serve(app, host='127.0.0.1', port=5000)
-serve(app, host='0.0.0.0', port=80)
+	return Response(run_model(graph_data, NUM_MAPS_TO_GENERATE), mimetype='text/plain')
+serve(app, host='127.0.0.1', port=5000)

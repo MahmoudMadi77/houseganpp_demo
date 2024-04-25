@@ -155,7 +155,7 @@ function draw(data) {
         }
         else{
           callback(data);
-          generate(); 
+          // generate(); 
         }
       },
       addEdge: function (data, callback) {
@@ -169,7 +169,7 @@ function draw(data) {
       },
       deleteEdge: function(data, callback) {
         callback(data);
-        generate();
+        // generate();
       },
     },
   };
@@ -187,7 +187,7 @@ function editNode(data, label, cancelAction, callback) {
   data.color = room_to_color[data.label]
   clearNodePopUp();
   callback(data);
-  generate();
+  // generate();
 }
 
 // Callback passed as parameter is ignored
@@ -208,7 +208,7 @@ function saveEdgeData(data, callback) {
   data.color = '#D3A2C7';
   data.width = 3;
   callback(data);
-  generate();
+  // generate();
 }
 
 function checker_reset(k){
@@ -223,7 +223,7 @@ function checker_complete(k){
   $(".path"+k.toString()).attr("class", "path"+k.toString()+" path-complete"+k.toString());
 }
 
-function generate() {
+function bruh() {
 
   // start checker
   for (var i = 0; i < 6; i++){
@@ -313,8 +313,8 @@ function generate() {
       }
   }
 
-  // xhr.open("POST", 'http://localhost:5000/generate', true);
-  xhr.open("POST", 'http://houseganpp.com/generate', true);
+  xhr.open("POST", 'http://localhost:5000/generate', true);
+  // xhr.open("POST", 'http://houseganpp.com/generate', true);
   xhr.setRequestHeader('Content-Type', 'text/plain');
   xhr.send(JSON.stringify(graph_info));
 }
@@ -332,7 +332,7 @@ function setTemplate(id){
   data = get_data_object(id);
   add_legend(data);
   draw(data);
-  generate();
+  // generate();
 }
 
 function get_data_object(template_id) {

@@ -10,6 +10,10 @@ import json
 import sys
 import time
 from python.utils import fix_nodes, check_validity, get_nxgraph, get_mistakes, remove_multiple_components
+from python.auto_filter import validate_data
+
+from datetime import datetime
+from json import dump as json_dump 
 
 # enable cuDNN auto-tuner
 torch.backends.cudnn.benchmark = True
@@ -92,7 +96,7 @@ def _infer(graph, model, prev_state=None, device='cpu'):
 		masks = masks.detach().float().cpu().numpy()
 	return masks
 
-def run_model(graph_data):
+def run_model(graph_data, generation_num):
 
 	# parse json
 	fp_graph = parse_json(graph_data)
@@ -119,7 +123,11 @@ def run_model(graph_data):
 	selected_types = [all_types[:k+1] for k in range(50)]
 	# selected_types = [[9, 15], [9, 15], [9, 15], [3, 9, 15], [1, 2, 3, 9, 15], [0, 1, 2, 3, 9, 15], [0, 1, 2, 3, 9, 15], [0, 1, 2, 3, 5, 9, 15], [0, 1, 2, 3, 5, 6, 9, 15], [0, 1, 2, 3, 4, 5, 6, 7, 9, 14, 15, 16]] # best for exp_random_types_attempt_3_A_500000_G - FID
 	# selected_types += [_types for k in range(90)]
-	for k in range(6):
+	filename = "images/" + str(datetime.now()).replace(":", "-").replace(" ", "_").split(".")[0]
+	with open(filename + ".json", 'w') as outf:
+		json_dump(graph_data, outf)
+	k = 0
+	while k < generation_num:
 		state = {'masks': None, 'fixed_nodes': []}
 		masks = _infer(fp_graph, model, state, device)
 		_tracker = (get_mistakes(masks.copy(), real_nodes, G_gt), masks)
@@ -155,4 +163,14 @@ def run_model(graph_data):
 
 		# send masks
 		im_svg = draw_masks(masks.copy(), real_nodes, im_size=256)
+		# print("im_svg Type:", type(im_svg))
+
+		if not validate_data(im_svg):
+			continue
+
+		with open(filename + "_%d.svg" % k, 'w') as outf:
+			outf.write(im_svg)
+
+		k += 1
+
 		yield '<stop>' + str(im_svg)
